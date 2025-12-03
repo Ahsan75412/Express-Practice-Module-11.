@@ -5,7 +5,7 @@ import {Pool} from 'pg';
 //.env file theke environment variable gula access korar jonno dotenv package import kora holo
 import dotenv from 'dotenv';
 //.env file er path set korar jonno path module import kora holo
-import Path from 'path';
+import path from 'path';
 
 
 
@@ -13,7 +13,7 @@ import Path from 'path';
 
 
 // .env file theke environment variable gula load korar jonno dotenv.config() use kora holo
-dotenv.config({path: Path.join(process.cwd() , '.env')});
+dotenv.config({path: path.join(process.cwd() , '.env')});
 
 const app = express()
 const port = 5000
@@ -31,7 +31,7 @@ app.use(express.urlencoded());
 
 // to connect with database
 const pool = new Pool({
-  connectionString: '${process.env.CONNECTION_STR}',
+  connectionString: `${process.env.CONNECTION_STR}`,
 });
 
 
@@ -74,9 +74,38 @@ app.get('/', (req: Request, res: Response) => {
   
 })
 
-app.post("/", (req: Request, res: Response) => {
+app.post("/users", async (req: Request, res: Response) => {
 
-  console.log(req.body);
+  const { name, email } = req.body;
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO users (name, email) VALUES ($1, $2) RETURNING *`, 
+      [name, email]
+    );
+
+    // console.log(result.rows[0]);
+
+    // res.send({
+    //   message: "User created successfully",
+    // })
+
+
+      res.status(201).json({
+      success: false, 
+      message: "User data created successfully",
+      data: result.rows[0],
+    });
+
+
+  }catch(err: any){
+    res.status(500).json({
+      success: false, 
+      message: err.message
+    });
+  }
+
+  // console.log(req.body);
 
   res.status(201).json({
     sucess: true,
@@ -84,6 +113,10 @@ app.post("/", (req: Request, res: Response) => {
     });
   // res.send("Post request received"); ei 2 vabei kora jay
 });
+
+
+
+
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
