@@ -7,3 +7,6 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Hello Next level developer mr.ahsan habib!')
 })
 
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`)
+})
