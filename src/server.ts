@@ -182,6 +182,81 @@ app.get("/users/:id", async (req: Request, res: Response) => {
 
 
 
+// update single user data by id using put api.......................................................
+
+
+app.put("/users/:id", async (req: Request, res: Response) => {
+  // const userId = req.params.id;
+  const { name, email } = req.body;
+  try {
+    const result = await pool.query(`UPDATE users SET name = $1, email = $2, updated_at = NOW() WHERE id = $3 RETURNING *`, [name, email, req.params.id]);
+    if (result.rows.length === 0) {
+      return  res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: "User data Updated successfully",
+      data: result.rows[0],
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+      details: err
+    });
+  }
+});
+
+
+
+
+
+
+
+
+
+// delete single user data by id using delete api.......................................................
+
+app.delete("/users/:id", async (req: Request, res: Response) => {
+  const userId = req.params.id;   
+  try {
+    const result = await pool.query(`DELETE FROM users WHERE id = $1 RETURNING *`, [userId]);
+    if (result.rows.length === 0) {
+      return  res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: "User data Deleted successfully",
+      // data: result.rows[0],
+      data: null,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+      details: err
+    });
+  }
+});
+
+
+// Data base End haere............................................................................
+
+
+
+
+
+
+
+
+
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
