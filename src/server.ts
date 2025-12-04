@@ -74,6 +74,9 @@ app.get('/', (req: Request, res: Response) => {
   
 })
 
+
+// created user data using post api.......................................................
+
 app.post("/users", async (req: Request, res: Response) => {
 
   const { name, email } = req.body;
@@ -107,12 +110,41 @@ app.post("/users", async (req: Request, res: Response) => {
 
   // console.log(req.body);
 
-  res.status(201).json({
-    sucess: true,
-     message: "post Data created successfully" 
-    });
+
+  // try catch theke already upore theke response pathano hoise tai eta comment kora holo............................
+
+  // res.status(201).json({
+  //   sucess: true,
+  //    message: "post Data created successfully" 
+  //   });
   // res.send("Post request received"); ei 2 vabei kora jay
 });
+
+
+
+
+
+
+//created read data using get api.......................................................
+
+app.get("/users", async (req: Request, res: Response) => {
+  try {
+    const result = await pool.query(`SELECT * FROM users`);
+    res.status(200).json({
+      success: true,
+      message: "Users data retrieved successfully",
+      data: result.rows,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+      details: err
+    });
+  }
+});
+
+
 
 
 
